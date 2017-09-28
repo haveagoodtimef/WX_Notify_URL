@@ -27,13 +27,14 @@ import com.jeefw.model.sys.RechargeRecordError;
 import core.util.WXMD5;
 import core.util.Xml_reader;
 
-
+/**
+* 微信回调地址
+*/
 @Controller
 @RequestMapping("/wx")
 public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> implements Constant {
-	//通知微信不要在重复发送消息了
-	private static boolean flag = true;
 	
+	//存储过程要用到的值
 	private static String Attach;
 	private static int status;
 	private static double money;
@@ -50,8 +51,8 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	@RequestMapping(value = "/callback", method = { RequestMethod.POST, RequestMethod.GET })
 	public void getDict(HttpServletRequest request, HttpServletResponse response) throws Exception {
 			
-			System.out.println("进入方法:......");
-		    String result;//返回给微信的处理结果  
+		System.out.println("进入方法:......");
+		String result;//返回给微信的处理结果  
 	        String inputLine;  
 	        String notityXml = "";  
 	        request.setCharacterEncoding("UTF-8");  
@@ -64,7 +65,7 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	        try {  
 	            while ((inputLine = request.getReader().readLine()) != null) {  
 	                notityXml += inputLine;  
-	               // System.out.println(notityXml);
+	               //System.out.println(notityXml);
 	            }  
 	            request.getReader().close();  
 	        } catch (Exception e) {  
@@ -100,8 +101,9 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	        String trade_type = (String) map.get("trade_type");//交易类型  
 	        String transaction_id = (String) map.get("transaction_id");//微信支付订单号  
 	        System.out.println("map数据提取完毕..");
-	        //存入数据库中的数据.
-	        
+	       
+		
+		//存入数据库中的数据.
 	        Attach = attach;
 	        if("SUCCESS".equals(result_code)) {
 	        	status = 1;
@@ -135,13 +137,13 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	        
 	        //MD5加密  - 验证信息
 	    	StringBuffer sb = new StringBuffer();
-			for(Map.Entry<String, String> entry : parameters.entrySet()) {
-				sb.append(entry.getKey()+"="+entry.getValue()+"&");
-			}
-			sb.append("key=qixiamajiang11335577992244668800");
-			String miyao = sb.toString();
-			System.out.println("miyao:+++++>>>>>>"+miyao);
-			String endsign = WXMD5.MD5(miyao);
+		for(Map.Entry<String, String> entry : parameters.entrySet()) {
+			sb.append(entry.getKey()+"="+entry.getValue()+"&");
+		}
+		sb.append("key=qixiamajiang11335577992244668800");
+		String miyao = sb.toString();
+		System.out.println("miyao:+++++>>>>>>"+miyao);
+		String endsign = WXMD5.MD5(miyao);
 	        System.out.println("MD5.加密后的字符串...endsign===="+endsign);
 	          
 	        System.out.println("**************************************************************************************************");  
@@ -168,23 +170,23 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	        // 验证签名  
 	        if (sign.equals(endsign)) {  
 	        	SessionFactory sf = baseDao4.getSessionFactory();
- 				 sessionss = sf.openSession();
-	        	 //如果成功写入数据库 ,调用具体执行的业务.
+ 			sessionss = sf.openSession();
+	        	//如果成功写入数据库 ,调用具体执行的业务.
 		        MsgService();
-	            //result = setXml("SUCCESS", ""); 
+	                //result = setXml("SUCCESS", ""); 
 		        System.out.println("开始给微信返回信息!");
 		        result = "<xml>" + 
 		        		"<return_code><![CDATA[SUCCESS]]></return_code>" + 
 		        		"<return_msg><![CDATA[OK]]></return_msg>" + 
-		        		"</xml>";
-	            response.getWriter().write(result);//返回给微信的消息,防止重复验证.有人说直接返回success字符串即可
-	            System.out.println("回调成功");  
+		        	"</xml>";
+	          	response.getWriter().write(result);//返回给微信的消息,防止重复验证。最好在存储过程中加入字段状态的判断。
+	                System.out.println("回调成功");  
 		        System.out.println("----返回给微信的xml：" + result);  
 	        } else {  
-	            System.err.println("签名不一致！");  
-	            result = setXml("fail", "签名不一致！");  
-	            response.getWriter().write(result);
-	            response.getWriter().flush();
+	            	System.err.println("签名不一致！");  
+	            	result = setXml("fail", "签名不一致！");  
+	            	response.getWriter().write(result);
+	            	response.getWriter().flush();
 	        } 
 	    }  
 	  
@@ -200,11 +202,11 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	    public static void MsgService() {
  	        	System.out.println("正在写入数据库:........");
  	        	try {
- 					sessionss.doWork(new Work() {
- 						@Override
- 						public void execute(Connection connection) throws SQLException {
- 							 CallableStatement cs = connection.prepareCall("{CALL GSP_GR_Distributor_A(?,?,?,?,?,?,?,?)}");
- 							 cs.setString(1, Attach);//传来的userid
+ 				sessionss.doWork(new Work() {
+ 					@Override
+ 					public void execute(Connection connection) throws SQLException {
+ 					 CallableStatement cs = connection.prepareCall("{CALL GSP_GR_Distributor_A(?,?,?,?,?,?,?,?)}");
+ 					 cs.setString(1, Attach);//传来的userid
  		                	 cs.setInt(2, status);//成功为1.失败为0
  		                	 cs.setDouble(3, money);//金额    
  		                	 cs.setString(4, wxId);//openid    
