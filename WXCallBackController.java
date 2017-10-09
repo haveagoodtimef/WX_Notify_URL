@@ -115,7 +115,7 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	        wxofferId = transaction_id;
 	        mch_ID = mch_id;
 	        
-	        
+	        //微信对数据的顺序有要求。
 	        SortedMap<String, String> parameters = new TreeMap<String, String>();  
 	        // 数据加密  
 	        parameters.put("appid", appid);//应用ID  
@@ -164,10 +164,11 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	        System.out.println(total_fee+"-------------------获取订单金额");  
 	        System.out.println(trade_type+"-------------------交易类型");  
 	        System.out.println(transaction_id+"-------------------微信支付订单号");  
-	        System.out.println(endsign+"-------------------第二次加密sign");  
+	        System.out.println(endsign+"-------------------自己加密的endsign要与微信返回的sign做对比");  
 	        System.out.println("**************************************************************************************************");  
 	          
 	        // 验证签名  
+		// 把返回的信息用户MD5加密，然后与微信返回的sign对比。
 	        if (sign.equals(endsign)) {  
 	        	SessionFactory sf = baseDao4.getSessionFactory();
  			sessionss = sf.openSession();
@@ -185,12 +186,10 @@ public class WXCallBackController extends JavaEEFrameworkBaseController<Dict> im
 	        } else {  
 	            	System.err.println("签名不一致！");  
 	            	result = setXml("fail", "签名不一致！");  
-	            	response.getWriter().write(result);
-	            	response.getWriter().flush();
 	        } 
 	    }  
 	  
-	    //通过xml 发给微信消息  
+	    //通过xml 发给微信消息  （没有用上）
 	    public static String setXml(String return_code, String return_msg) {  
 	        return "<xml><return_code><![CDATA[" + return_code + "]]>" +   
 	                "</return_code><return_msg><![CDATA[" + return_msg + "]]></return_msg></xml>";  
