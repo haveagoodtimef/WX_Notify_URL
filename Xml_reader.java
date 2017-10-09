@@ -18,15 +18,14 @@ import org.dom4j.Element;
  * 2017年9月28日
  */
 public class Xml_reader {
-
 	public static Map<String, String> read(String xmlStr) {
-		 Map<String,String> map = null;
+		Map<String,String> map = null;
 		try {
 			Document document = DocumentHelper.parseText(xmlStr);
-			 //获取根节点元素对象  
-	        Element root = document.getRootElement(); 
-	        //遍历  
-	       map =  listNodes(root);  
+			//获取根节点元素对象  
+	        	Element root = document.getRootElement(); 
+	        	//遍历  
+	      		map =  listNodes(root);  
 		} catch (DocumentException e) {
 			System.out.println("创建dom对象错误!");
 			e.printStackTrace();
@@ -34,7 +33,7 @@ public class Xml_reader {
 		return map;
 	}
 	
-	 //遍历当前节点下的所有节点  
+    //遍历当前节点下的所有节点  
     public static Map<String,String> listNodes(Element node){  
     	Map<String,String> map = new TreeMap<>(); 
         //System.out.println("当前节点的名称：" + node.getName());  
@@ -47,10 +46,9 @@ public class Xml_reader {
         //如果当前节点内容不为空，则输出  
         if(!(node.getTextTrim().equals(""))){  
              //System.out.println( "222222222"+node.getName() + "：" + node.getText());    
-        	  //map.put(node.getName(), node.getText());
-        	 // map.put("1", "3");
-        	  
-        	 // System.out.println("添加map");
+             //map.put(node.getName(), node.getText());
+             // map.put("1", "3");
+             // System.out.println("添加map");
         	  
         }  
         //同时迭代当前节点下面的所有子节点  
